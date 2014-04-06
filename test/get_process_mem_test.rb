@@ -13,10 +13,24 @@ class GetProcessMemTest < Test::Unit::TestCase
     assert @mem.bytes > 0
   end
 
-  def test_linux_smap
+  def test_linux_smap_pss
     delta = 1
     bytes = @mem.linux_memory(fixture_path("heroku-bash-smap"))
     assert_in_delta BigDecimal.new("1217024.0"), bytes, delta
+  end
+
+  def test_linux_smap_rss
+    delta = 1
+    @mem.mem_type = 'Rss'
+    bytes = @mem.linux_memory(fixture_path("heroku-bash-smap"))
+    assert_in_delta BigDecimal.new("2122240.0"), bytes, delta
+  end
+
+  def test_linux_smap_private_dirty
+    delta = 1
+    @mem.mem_type = 'Private_Dirty'
+    bytes = @mem.linux_memory(fixture_path("heroku-bash-smap"))
+    assert_in_delta BigDecimal.new("573952.0"), bytes, delta
   end
 
   def test_conversions
