@@ -8,7 +8,6 @@ class GetProcessMem
   MB_TO_BYTE = 1_048_576     # 1024**2 = 1_048_576
   GB_TO_BYTE = 1_073_741_824 # 1024**3 = 1_073_741_824
   CONVERSION = { "kb" => KB_TO_BYTE, "mb" => MB_TO_BYTE, "gb" => GB_TO_BYTE }
-  ROUND_UP   = BigDecimal.new("0.5")
   attr_reader :pid
 
   def initialize(pid = Process.pid)
@@ -60,9 +59,8 @@ class GetProcessMem
     return if lines.empty?
     lines.reduce(0) do |sum, line|
       line.match(/(?<value>(\d*\.{0,1}\d+))\s+(?<unit>\w\w)/) do |m|
-        value = BigDecimal.new(m[:value]) + ROUND_UP
         unit  = m[:unit].downcase
-        sum += CONVERSION[unit] * value
+        sum += CONVERSION[unit] * BigDecimal.new(m[:value])
       end
       sum
     end
